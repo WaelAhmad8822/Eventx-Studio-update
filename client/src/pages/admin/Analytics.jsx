@@ -111,12 +111,12 @@ const AdminAnalytics = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Popular Event Categories</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={analyticsData.popularCategories} layout="horizontal">
+                <BarChart data={analyticsData.popularCategories} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="_id" type="category" width={80} />
+                  <XAxis type="number" allowDecimals={false} domain={[0, 'dataMax']} />
+                  <YAxis dataKey="_id" type="category" width={110} />
                   <Tooltip />
-                  <Bar dataKey="count" fill="#10B981" />
+                  <Bar dataKey="count" fill="#10B981" barSize={22} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
