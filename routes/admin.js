@@ -241,11 +241,21 @@ router.get('/analytics', adminAuth, async (req, res) => {
       ageGroups = [];
     }
 
-    // Popular categories
+    // Popular categories by ticket sales (counts tickets per event category, excluding cancelled tickets)
     let popularCategories = [];
     try {
-      popularCategories = await Event.aggregate([
-        { $group: { _id: '$category', count: { $sum: 1 } } },
+      popularCategories = await Ticket.aggregate([
+        { $match: { status: { $ne: 'cancelled' } } },
+        {
+          $lookup: {
+            from: 'events',
+            localField: 'event',
+            foreignField: '_id',
+            as: 'event'
+          }
+        },
+        { $unwind: '$event' },
+        { $group: { _id: '$event.category', count: { $sum: 1 } } },
         { $sort: { count: -1 } }
       ]);
     } catch (error) {
@@ -282,17 +292,20 @@ router.get('/analytics', adminAuth, async (req, res) => {
       topEvents = [];
     }
 
-    // Location distribution
+    // Location distribution (normalize city names and exclude empty values)
     let locationDistribution = [];
     try {
       locationDistribution = await User.aggregate([
-        { $match: { role: 'user', 'location.city': { $exists: true } } },
+        { $match: { role: 'user' } },
         {
-          $group: {
-            _id: '$location.city',
-            count: { $sum: 1 }
+          $project: {
+            cityNorm: {
+              $trim: { input: { $ifNull: ['$location.city', ''] } }
+            }
           }
         },
+        { $match: { cityNorm: { $ne: '' } } },
+        { $group: { _id: '$cityNorm', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
         { $limit: 10 }
       ]);
