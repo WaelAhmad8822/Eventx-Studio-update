@@ -192,7 +192,18 @@ const AdminEvents = () => {
                   <tr key={event._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="h-12 w-12 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-sm">IMG</div>
+                        <div className="h-12 w-12 bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center text-gray-500 text-sm">
+                          {event.image ? (
+                            <img
+                              src={event.image}
+                              alt={event.title}
+                              className="h-full w-full object-cover"
+                              onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.style.display = 'none'; }}
+                            />
+                          ) : (
+                            'IMG'
+                          )}
+                        </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">{event.title}</div>
                           <div className={`text-xs px-2 py-1 rounded-full ${getCategoryColor(event.category)}`}>{event.category}</div>
